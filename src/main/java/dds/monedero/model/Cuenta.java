@@ -33,7 +33,7 @@ public class Cuenta {
 
     if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3) {
       throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
-    }
+    } //Long Method? (Se puede extraer la verificación en otro método)
 
     new Movimiento(LocalDate.now(), cuanto, true).agregateA(this);
   }
@@ -52,18 +52,18 @@ public class Cuenta {
           + " diarios, límite: " + limite);
     }
     new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
-  }
+  }//Long method (se puede extraer en más de un método)
 
   public void agregarMovimiento(LocalDate fecha, double cuanto, boolean esDeposito) {
     Movimiento movimiento = new Movimiento(fecha, cuanto, esDeposito);
     movimientos.add(movimiento);
-  }
+  } //Primitive obsession? (por estar usando muchos valores primitivos)
 
   public double getMontoExtraidoA(LocalDate fecha) {
     return getMovimientos().stream()
         .filter(movimiento -> !movimiento.isDeposito() && movimiento.getFecha().equals(fecha))
         .mapToDouble(Movimiento::getMonto)
-        .sum();
+        .sum(); //Feature Envy
   }
 
   public List<Movimiento> getMovimientos() {
