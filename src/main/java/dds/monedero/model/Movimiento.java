@@ -41,7 +41,7 @@ public class Movimiento {
 
   public boolean isExtraccion() {
     return !esDeposito;
-  } //Código duplicado entre isDeposito, isExtraccion, fueDepositado, fueExtraido
+  } //Data Clumps, parece un repo de información que se consulta
 
   public void agregateA(Cuenta cuenta) {
     cuenta.setSaldo(calcularValor(cuenta));
@@ -49,7 +49,7 @@ public class Movimiento {
   }
 
   public double calcularValor(Cuenta cuenta) {
-    if (esDeposito) {
+    if (esDeposito) { //Type Test, no hace falta checkear si esDeposito, se debe usar polimorfismo
       return cuenta.getSaldo() + getMonto();
     } else {
       return cuenta.getSaldo() - getMonto();

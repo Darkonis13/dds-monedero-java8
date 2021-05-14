@@ -27,21 +27,31 @@ public class Cuenta {
   }
 
   public void poner(double cuanto) {
-    if (cuanto <= 0) {
-      throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
-    }
 
-    if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3) {
+
+    if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3) { //Type Test de parte de movimiento
       throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
-    } //Long Method? (Se puede extraer la verificación en otro método)
+    }
 
     new Movimiento(LocalDate.now(), cuanto, true).agregateA(this);
   }
 
-  public void sacar(double cuanto) {
+  public void verificarMonto(double cuanto, int limiteExtraccion){
     if (cuanto <= 0) {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
     }
+
+    if (cuanto >= limiteExtraccion) {
+      throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
+    }
+  }
+
+
+
+  public void sacar(double cuanto) {
+    if (cuanto <= 0) {
+      throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
+    } //Duplicated code (igual a la linea 40, se puede abstraer el método que checkea)
     if (getSaldo() - cuanto < 0) {
       throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
     }
@@ -57,7 +67,7 @@ public class Cuenta {
   public void agregarMovimiento(LocalDate fecha, double cuanto, boolean esDeposito) {
     Movimiento movimiento = new Movimiento(fecha, cuanto, esDeposito);
     movimientos.add(movimiento);
-  } //Primitive obsession? (por estar usando muchos valores primitivos)
+  }
 
   public double getMontoExtraidoA(LocalDate fecha) {
     return getMovimientos().stream()
@@ -78,4 +88,4 @@ public class Cuenta {
     this.saldo = saldo;
   }
 
-}
+} //Long Method (Faltan abstracciones que eliminen la baja cohesión del código actual)
