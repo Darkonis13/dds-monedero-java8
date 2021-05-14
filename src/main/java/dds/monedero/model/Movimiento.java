@@ -3,8 +3,8 @@ package dds.monedero.model;
 import java.time.LocalDate;
 
 public abstract class Movimiento {
-  private LocalDate fecha;
-  private double monto;
+  private final LocalDate fecha;
+  private final double monto;
 
   public Movimiento(LocalDate fecha, double monto) {
     this.fecha = fecha;

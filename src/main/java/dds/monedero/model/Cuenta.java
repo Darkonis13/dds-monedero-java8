@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 
 public class Cuenta {
 
-  private double saldo = 0;
-  private List<Deposito> depositos = new ArrayList<>();
-  private List<Extraccion> extracciones = new ArrayList<>();
+  private double saldo;
+  private final List<Deposito> depositos = new ArrayList<>();
+  private final List<Extraccion> extracciones = new ArrayList<>();
 
   public Cuenta() {
     saldo = 0;
@@ -41,36 +41,32 @@ public class Cuenta {
   }
 
   public void poner(double cuanto) {
-    if (getDepositos().size() >= 3) {
-      throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
-    }
-
-    if (cuanto <= 0) {
-      throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
-    }
-
+    verificarMontoNegativo(cuanto);
+    verificarCantidadDepositos(cuanto);
     new Deposito(LocalDate.now(), cuanto).agregarMovimientoA(this);
   }
 
-  public void verificarMonto(double cuanto, int limiteExtraccion){ //Este método no se usa nunca
-    if (cuanto <= 0) {
-      throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
-    }
-
-    if (cuanto >= limiteExtraccion) {
-      throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios"); //el limiteExtraccion está harcodeado en la exception
+  public void verificarCantidadDepositos(double cuanto){
+    if (cuanto >= 3) {
+      throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
     }
   }
 
-
-
-  public void sacar(double cuanto) {
+  public void verificarMontoNegativo(double cuanto){ //Este método no se usa nunca
     if (cuanto <= 0) {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
-    } //Duplicated code (igual a la linea 40, se puede abstraer el método que checkea)
+    }
+  }
+
+  public void verificarExtraccion(double cuanto){
+    verificarMontoNegativo(cuanto);
     if (getSaldo() - cuanto < 0) {
       throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
     }
+  }
+
+  public void sacar(double cuanto) {
+    verificarExtraccion(cuanto);
     double montoExtraidoHoy = getMontoExtraidoA(LocalDate.now());
     double limite = 1000 - montoExtraidoHoy;
     if (cuanto > limite) {
@@ -78,7 +74,7 @@ public class Cuenta {
           + " diarios, límite: " + limite);
     }
     new Extraccion(LocalDate.now(), cuanto).agregarMovimientoA(this);
-  }//Long method (se puede extraer en más de un método)
+  }
 
   public double getMontoExtraidoA(LocalDate fecha) {
     return sumarExtracciones(getExtraccionesDeLaFecha(fecha));
@@ -111,4 +107,4 @@ public class Cuenta {
     this.saldo = saldo;
   }
 
-} //Long Method (Faltan abstracciones que eliminen la baja cohesión del código actual)
+}
