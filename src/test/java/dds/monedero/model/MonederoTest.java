@@ -7,6 +7,9 @@ import dds.monedero.exceptions.SaldoMenorException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MonederoTest {
@@ -20,6 +23,13 @@ public class MonederoTest {
   @Test
   void Poner() {
     cuenta.poner(1500);
+  } //Para qué quiero testear esto? Mejor testeo getMontoExtraidoA()
+
+  @Test
+  void seRevisaElMontoExtraidoHoy(){
+    cuenta.poner(1500);
+    cuenta.sacar(1000);
+    assertEquals(1000,cuenta.getMontoExtraidoA(LocalDate.now()));
   }
 
   @Test
@@ -28,10 +38,11 @@ public class MonederoTest {
   }
 
   @Test
-  void TresDepositos() {
+  void SeRegistranTresDepositos() {//No hay assert en este Test, se arregla. Se mejora la expresividad del test
     cuenta.poner(1500);
     cuenta.poner(456);
     cuenta.poner(1900);
+    assertEquals(3,cuenta.getMovimientos().size());
   }
 
   @Test
@@ -46,17 +57,17 @@ public class MonederoTest {
 
   @Test
   void ExtraerMasQueElSaldo() {
+    cuenta.poner(90);
     assertThrows(SaldoMenorException.class, () -> {
-          cuenta.setSaldo(90);
           cuenta.sacar(1001);
     });
   }
 
   @Test
   public void ExtraerMasDe1000() {
+    cuenta.poner(5000);
     assertThrows(MaximoExtraccionDiarioException.class, () -> {
-      cuenta.setSaldo(5000);
-      cuenta.sacar(1001);
+      cuenta.sacar(1001); //setSaldo rompe encapsulamiento y se puede usar cuenta.poner()
     });
   }
 
