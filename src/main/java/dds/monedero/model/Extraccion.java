@@ -7,6 +7,10 @@ public class Extraccion extends Movimiento{
         super(fecha, monto);
     }
 
+    public boolean esDeFecha(LocalDate fecha){
+        return getFecha() == fecha;
+    }
+
     @Override
     public void agregarMovimientoA(Cuenta cuenta) {
         super.agregarMovimientoA(cuenta);
