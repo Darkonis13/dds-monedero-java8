@@ -12,7 +12,8 @@ import java.util.List;
 public class Cuenta {
 
   private double saldo = 0;
-  private List<Movimiento> movimientos = new ArrayList<>();
+  private List<Deposito> depositos = new ArrayList<>();
+  private List<Extraccion> extracciones = new ArrayList<>();
 
   public Cuenta() {
     saldo = 0;
@@ -22,27 +23,45 @@ public class Cuenta {
     saldo = montoInicial;
   }
 
-  public void setMovimientos(List<Movimiento> movimientos) {
-    this.movimientos = movimientos;
+  public void agregarExtraccion(Extraccion extraccion){
+    this.extracciones.add(extraccion);
+  }
+
+  public void agregarDeposito(Deposito deposito) {
+    this.depositos.add(deposito);
+  }
+
+  public List<Extraccion> getExtracciones() {
+    return extracciones;
+  }
+
+  public List<Deposito> getDepositos() {
+    return depositos;
+  }
+
+  public void setExtracciones(List<Extraccion> extracciones) {
+    this.extracciones = extracciones;
   }
 
   public void poner(double cuanto) {
-
-
-    if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3) { //Type Test de parte de movimiento
+    if (getDepositos().size() >= 3) {
       throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
     }
 
-    new Movimiento(LocalDate.now(), cuanto, true).agregateA(this);
+    if (cuanto <= 0) {
+      throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
+    }
+
+    new Deposito(LocalDate.now(), cuanto).agregarMovimientoA(this);
   }
 
-  public void verificarMonto(double cuanto, int limiteExtraccion){
+  public void verificarMonto(double cuanto, int limiteExtraccion){ //Este método no se usa nunca
     if (cuanto <= 0) {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
     }
 
     if (cuanto >= limiteExtraccion) {
-      throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
+      throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios"); //el limiteExtraccion está harcodeado en la exception
     }
   }
 
@@ -61,22 +80,20 @@ public class Cuenta {
       throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + 1000
           + " diarios, límite: " + limite);
     }
-    new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
+    new Extraccion(LocalDate.now(), cuanto).agregarMovimientoA(this);
   }//Long method (se puede extraer en más de un método)
 
-  public void agregarMovimiento(LocalDate fecha, double cuanto, boolean esDeposito) {
-    Movimiento movimiento = new Movimiento(fecha, cuanto, esDeposito);
-    movimientos.add(movimiento);
-  }
-
   public double getMontoExtraidoA(LocalDate fecha) {
-    return getMovimientos().stream()
-        .filter(movimiento -> !movimiento.isDeposito() && movimiento.getFecha().equals(fecha))
+    return getExtracciones().stream()
+        .filter(extraccion -> extraccion.getFecha().equals(fecha))
         .mapToDouble(Movimiento::getMonto)
         .sum(); //Feature Envy
   }
 
   public List<Movimiento> getMovimientos() {
+    List<Movimiento> movimientos = new ArrayList<>();
+    movimientos.addAll(extracciones);
+    movimientos.addAll(depositos);
     return movimientos;
   }
 
