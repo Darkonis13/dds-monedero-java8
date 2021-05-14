@@ -23,7 +23,7 @@ public class MonederoTest {
   @Test
   void Poner() {
     cuenta.poner(1500);
-  } //Para qué quiero testear esto? Mejor testeo getMontoExtraidoA()
+  }
 
   @Test
   void seRevisaElMontoExtraidoHoy(){
@@ -38,7 +38,7 @@ public class MonederoTest {
   }
 
   @Test
-  void SeRegistranTresDepositos() {//No hay assert en este Test, se arregla. Se mejora la expresividad del test
+  void SeRegistranTresDepositos() {
     cuenta.poner(1500);
     cuenta.poner(456);
     cuenta.poner(1900);
@@ -67,7 +67,7 @@ public class MonederoTest {
   public void ExtraerMasDe1000() {
     cuenta.poner(5000);
     assertThrows(MaximoExtraccionDiarioException.class, () -> {
-      cuenta.sacar(1001); //setSaldo rompe encapsulamiento y se puede usar cuenta.poner()
+      cuenta.sacar(1001);
     });
   }
 

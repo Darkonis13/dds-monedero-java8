@@ -2,7 +2,7 @@ package dds.monedero.model;
 
 import java.time.LocalDate;
 
-public abstract class Movimiento {
+public class Movimiento {
   private final LocalDate fecha;
   private final double monto;
 
@@ -15,15 +15,11 @@ public abstract class Movimiento {
     return monto;
   }
 
-  public LocalDate getFecha() {
-    return fecha;
+  public boolean esDeFecha(LocalDate fecha){
+    return getFecha() == fecha;
   }
 
-  public void agregarMovimientoA(Cuenta cuenta) {
-    cuenta.setSaldo(calcularValor(cuenta));
-  }//Misplaced Method, este debe ir en Cuenta
-
-  public double calcularValor(Cuenta cuenta) {
-      return cuenta.getSaldo() + getMonto();
+  public LocalDate getFecha() {
+    return fecha;
   }
 }

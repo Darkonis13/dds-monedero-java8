@@ -13,8 +13,7 @@ import java.util.stream.Collectors;
 public class Cuenta {
 
   private double saldo;
-  private final List<Deposito> depositos = new ArrayList<>();
-  private final List<Extraccion> extracciones = new ArrayList<>();
+  private final List<Movimiento> movimientos = new ArrayList<>();
 
   public Cuenta() {
     saldo = 0;
@@ -24,26 +23,20 @@ public class Cuenta {
     saldo = montoInicial;
   }
 
-  public void agregarExtraccion(Extraccion extraccion){
-    this.extracciones.add(extraccion);
+  public void agregarMovimiento(Movimiento movimiento) {
+    this.poner(movimiento.getMonto());
+    this.movimientos.add(movimiento);
   }
 
-  public void agregarDeposito(Deposito deposito) {
-    this.depositos.add(deposito);
-  }
-
-  public List<Extraccion> getExtracciones() {
-    return extracciones;
-  }
-
-  public List<Deposito> getDepositos() {
-    return depositos;
+  public List<Movimiento> getMovimientos() {
+    return movimientos;
   }
 
   public void poner(double cuanto) {
     verificarMontoNegativo(cuanto);
     verificarCantidadDepositos(cuanto);
-    new Deposito(LocalDate.now(), cuanto).agregarMovimientoA(this);
+    Movimiento movimiento = new Movimiento(LocalDate.now(), cuanto);
+    agregarMovimiento(movimiento);
   }
 
   public void verificarCantidadDepositos(double cuanto){
@@ -73,30 +66,24 @@ public class Cuenta {
       throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + 1000
           + " diarios, límite: " + limite);
     }
-    new Extraccion(LocalDate.now(), cuanto).agregarMovimientoA(this);
+    Movimiento movimiento = new Movimiento(LocalDate.now(), cuanto);
+    agregarMovimiento(movimiento);
   }
 
   public double getMontoExtraidoA(LocalDate fecha) {
     return sumarExtracciones(getExtraccionesDeLaFecha(fecha));
   }
 
-  public double sumarExtracciones(List <Extraccion> extracciones){
+  public double sumarExtracciones(List <Movimiento> extracciones){
     return extracciones.stream()
             .mapToDouble(Movimiento::getMonto)
             .sum();
   }
 
-  public List<Extraccion> getExtraccionesDeLaFecha(LocalDate fecha){
-    return getExtracciones().stream()
+  public List<Movimiento> getExtraccionesDeLaFecha(LocalDate fecha){
+    return getMovimientos().stream()
             .filter(extraccion -> extraccion.esDeFecha(fecha))
             .collect(Collectors.toList());
-  }
-
-  public List<Movimiento> getMovimientos() {
-    List<Movimiento> movimientos = new ArrayList<>();
-    movimientos.addAll(extracciones);
-    movimientos.addAll(depositos);
-    return movimientos;
   }
 
   public double getSaldo() {
